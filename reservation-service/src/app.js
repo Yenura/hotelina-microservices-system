@@ -2,9 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const swaggerUi = require('swagger-ui-express');
 const reservationRoutes = require('./routes/reservationRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const notFound = require('./middleware/notFound');
+const healthCheck = require('./middleware/healthCheck');
+const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
@@ -16,15 +19,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    service: process.env.SERVICE_NAME || 'reservation-service',
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-  });
-});
+app.get('/health', healthCheck);
 
+// ─── Swagger Documentation ────────────────────────────────────────────────────
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/reservations', reservationRoutes);
