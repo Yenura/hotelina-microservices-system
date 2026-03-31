@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 const gatewayRoutes = require('./routes/gateway');
 const errorHandler = require('./middleware/errorHandler');
 const { gatewayLimiter } = require('./middleware/rateLimit');
@@ -36,6 +38,9 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Swagger docs for API Gateway
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Gateway routes
 app.use('/api', gatewayRoutes);
