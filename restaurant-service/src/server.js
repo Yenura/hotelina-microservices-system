@@ -4,7 +4,7 @@ dotenv.config();
 const connectDB = require('./config/db');
 const app = require('./app');
 
-const PORT = process.env.PORT || 8004;
+const PORT = Number.parseInt(process.env.PORT, 10) || 8004;
 
 const MAX_PORT_ATTEMPTS = 10;
 
