@@ -7,7 +7,7 @@ const orderRoutes = require('./routes/order.routes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 const healthCheck = require('./middleware/healthCheck');
-const swaggerSpec = require('./swagger/swagger');
+const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
