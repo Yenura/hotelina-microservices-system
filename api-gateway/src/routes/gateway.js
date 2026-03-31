@@ -2,6 +2,61 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Auth
+ *     description: Authentication proxy routes
+ *   - name: Reservations
+ *     description: Reservation proxy routes
+ *   - name: Guests
+ *     description: Guest proxy routes
+ *   - name: Restaurants
+ *     description: Restaurant proxy routes
+ *   - name: Billing
+ *     description: Billing proxy routes
+ *
+ * /api/auth/*:
+ *   get:
+ *     summary: Proxy auth GET requests
+ *     tags: [Auth]
+ *   post:
+ *     summary: Proxy auth POST requests
+ *     tags: [Auth]
+ *
+ * /api/reservations/*:
+ *   get:
+ *     summary: Proxy reservation GET requests
+ *     tags: [Reservations]
+ *   post:
+ *     summary: Proxy reservation POST requests
+ *     tags: [Reservations]
+ *
+ * /api/guests/*:
+ *   get:
+ *     summary: Proxy guest GET requests
+ *     tags: [Guests]
+ *   post:
+ *     summary: Proxy guest POST requests
+ *     tags: [Guests]
+ *
+ * /api/restaurants/*:
+ *   get:
+ *     summary: Proxy restaurant GET requests
+ *     tags: [Restaurants]
+ *   post:
+ *     summary: Proxy restaurant POST requests
+ *     tags: [Restaurants]
+ *
+ * /api/billing/*:
+ *   get:
+ *     summary: Proxy billing GET requests
+ *     tags: [Billing]
+ *   post:
+ *     summary: Proxy billing POST requests
+ *     tags: [Billing]
+ */
+
 // Service URLs
 const services = {
   auth: process.env.AUTH_SERVICE_URL || 'http://localhost:8001',
