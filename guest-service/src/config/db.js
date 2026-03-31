@@ -1,13 +1,15 @@
 const mongoose = require("mongoose");
 
+/**
+ * Establishes connection to MongoDB guest_db
+ * Uses the MONGO_URI environment variable (falls back to local)
+ */
 const connectDB = async () => {
   try {
     const mongoURI =
-      process.env.MONGODB_URI || "mongodb://localhost:27017/guest_db";
-    const conn = await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+      process.env.MONGO_URI || "mongodb://127.0.0.1:27017/guest_db";
+
+    const conn = await mongoose.connect(mongoURI);
     console.log(
       `📦 MongoDB connected: ${conn.connection.host} / ${conn.connection.name}`
     );
