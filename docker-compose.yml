@@ -1,0 +1,144 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:latest
+    container_name: hotelina-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - hotelina-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    container_name: hotelina-api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - NODE_ENV=production
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - RESERVATION_SERVICE_URL=http://reservation-service:8002
+      - GUEST_SERVICE_URL=http://guest-service:8003
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:8004
+      - BILLING_SERVICE_URL=http://billing-service:8005
+    depends_on:
+      - auth-service
+      - reservation-service
+      - guest-service
+      - restaurant-service
+      - billing-service
+    networks:
+      - hotelina-network
+    restart: unless-stopped
+
+  # Auth Service
+  auth-service:
+    build: ./auth-service
+    container_name: hotelina-auth-service
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/auth_db?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key}
+      - JWT_EXPIRE=7d
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - hotelina-network
+    restart: unless-stopped
+
+  # Reservation Service
+  reservation-service:
+    build: ./reservation-service
+    container_name: hotelina-reservation-service
+    ports:
+      - "8002:8002"
+    environment:
+      - PORT=8002
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/reservation_db?authSource=admin
+      - SERVICE_NAME=reservation-service
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - hotelina-network
+    restart: unless-stopped
+
+  # Guest Service
+  guest-service:
+    build: ./guest-service
+    container_name: hotelina-guest-service
+    ports:
+      - "8003:8003"
+    environment:
+      - PORT=8003
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/guest_db?authSource=admin
+      - SERVICE_NAME=guest-service
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - hotelina-network
+    restart: unless-stopped
+
+  # Restaurant Service
+  restaurant-service:
+    build: ./restaurant-service
+    container_name: hotelina-restaurant-service
+    ports:
+      - "8004:8004"
+    environment:
+      - PORT=8004
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/restaurant_db?authSource=admin
+      - SERVICE_NAME=restaurant-service
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - hotelina-network
+    restart: unless-stopped
+
+  # Billing Service
+  billing-service:
+    build: ./billing-service
+    container_name: hotelina-billing-service
+    ports:
+      - "8005:8005"
+    environment:
+      - PORT=8005
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/billing_db?authSource=admin
+      - SERVICE_NAME=billing-service
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - hotelina-network
+    restart: unless-stopped
+
+networks:
+  hotelina-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local

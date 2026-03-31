@@ -17,7 +17,12 @@
     "mongoose": "^7.6.3",
     "morgan": "^1.10.0",
     "swagger-jsdoc": "^6.2.8",
+<<<<<<< HEAD
     "swagger-ui-express": "^5.0.0"
+=======
+    "swagger-ui-express": "^4.6.3",
+    "express-rate-limit": "^7.1.5"
+>>>>>>> 63742a2956c5ac92dbe80b3c186c95e1b6fd0589
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

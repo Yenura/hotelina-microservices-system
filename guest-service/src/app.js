@@ -2,10 +2,16 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const swaggerUi = require("swagger-ui-express");
 const guestRoutes = require("./routes/guestRoutes");
 const errorHandler = require("./middleware/errorHandler");
 const notFound = require("./middleware/notFound");
+<<<<<<< HEAD
 const setupSwagger = require("./config/swagger");
+=======
+const healthCheck = require("./middleware/healthCheck");
+const swaggerSpec = require("./config/swagger");
+>>>>>>> 63742a2956c5ac92dbe80b3c186c95e1b6fd0589
 
 const app = express();
 
@@ -20,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 setupSwagger(app);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
+<<<<<<< HEAD
 app.get("/health", (req, res) => {
   res.status(200).json({
     success: true,
@@ -30,6 +37,12 @@ app.get("/health", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+=======
+app.get("/health", healthCheck);
+
+// ─── Swagger Documentation ────────────────────────────────────────────────────
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+>>>>>>> 63742a2956c5ac92dbe80b3c186c95e1b6fd0589
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 // Mount on BOTH prefixes for flexibility:
