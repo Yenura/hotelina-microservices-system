@@ -2,14 +2,9 @@ const mongoose = require("mongoose");
 
 const guestSchema = new mongoose.Schema(
   {
-    firstName: {
+    name: {
       type: String,
-      required: [true, "First name is required"],
-      trim: true,
-    },
-    lastName: {
-      type: String,
-      required: [true, "Last name is required"],
+      required: [true, "Guest name is required"],
       trim: true,
     },
     email: {
@@ -17,41 +12,25 @@ const guestSchema = new mongoose.Schema(
       required: [true, "Email is required"],
       unique: true,
       lowercase: true,
+      trim: true,
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Please enter a valid email",
+        "Please enter a valid email address",
       ],
     },
     phone: {
       type: String,
-      required: [true, "Phone number is required"],
       trim: true,
     },
     address: {
       type: String,
       trim: true,
     },
-    city: {
+    nic: {
       type: String,
       trim: true,
-    },
-    country: {
-      type: String,
-      trim: true,
-    },
-    identityType: {
-      type: String,
-      enum: {
-        values: ["passport", "national_id", "drivers_license", "other"],
-        message:
-          "Identity type must be one of: passport, national_id, drivers_license, other",
-      },
-      required: [true, "Identity type is required"],
-    },
-    identityNumber: {
-      type: String,
-      required: [true, "Identity number is required"],
-      trim: true,
+      unique: true,
+      sparse: true, // allows multiple null values
     },
     status: {
       type: String,
@@ -63,15 +42,14 @@ const guestSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // adds createdAt & updatedAt automatically
     versionKey: false,
   }
 );
 
-// Index for common query patterns
+// Indexes for frequently queried fields
 guestSchema.index({ email: 1 });
-guestSchema.index({ firstName: 1, lastName: 1 });
-guestSchema.index({ status: 1 });
-guestSchema.index({ identityNumber: 1 });
+guestSchema.index({ nic: 1 });
+guestSchema.index({ name: "text" }); // text index for name search
 
 module.exports = mongoose.model("Guest", guestSchema);
