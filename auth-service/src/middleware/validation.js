@@ -11,6 +11,13 @@ const validateLogin = [
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
+const validateUpdatePassword = [
+  body('currentPassword').notEmpty().withMessage('Current password is required'),
+  body('newPassword')
+    .isLength({ min: 6 })
+    .withMessage('New password must be at least 6 characters'),
+];
+
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -23,4 +30,4 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-module.exports = { validateRegister, validateLogin, handleValidationErrors };
+module.exports = { validateRegister, validateLogin, validateUpdatePassword, handleValidationErrors };

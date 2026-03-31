@@ -1,32 +1,39 @@
 const jwt = require('jsonwebtoken');
 
-const verifyToken = (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
+const User = require('../models/User');
 
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'No token provided. Please login first.',
-      });
-    }
+const verifyToken = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
 
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.userId = decoded.id;
-      next();
-    } catch (err) {
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'No token provided. Please login first.',
+    });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+    if (err) {
+      console.error('JWT verify failed', err);
       return res.status(401).json({
         success: false,
         message: 'Token is invalid or expired',
       });
     }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Authentication error',
-    });
-  }
+
+    const user = await User.findById(decoded.id).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    req.userId = user._id.toString();
+    req.user = user;
+    next();
+  });
 };
 
 module.exports = verifyToken;
