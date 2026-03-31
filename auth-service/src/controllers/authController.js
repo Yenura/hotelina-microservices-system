@@ -2,8 +2,8 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
 // Generate JWT token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const generateToken = (user) => {
+  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || '7d'
   });
 };
@@ -40,7 +40,7 @@ exports.register = async (req, res, next) => {
     await user.save();
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     // Remove password from response
     user = user.toObject();
@@ -90,7 +90,7 @@ exports.login = async (req, res, next) => {
     }
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     // Remove password from response
     const userResponse = user.toObject();
@@ -135,9 +135,130 @@ exports.verifyToken = async (req, res, next) => {
       user
     });
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: 'Invalid token'
+    if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token'
+      });
+    }
+    next(error);
+  }
+};
+
+// Get profile for authenticated user
+exports.getProfile = async (req, res, next) => {
+  try {
+    const user = req.user || (await User.findById(req.userId).select('-password'));
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all users (admin only)
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    if (req.user?.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin access required'
+      });
+    }
+
+    const users = await User.find().select('-password');
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      users
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Update password
+exports.updatePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.userId).select('+password');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Current password is incorrect'
+      });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be different from current password'
+      });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete user (self-delete only)
+exports.deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const requester = req.user;
+    if (!requester) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+
+    if (id !== requester._id.toString() && requester.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only delete your own account unless you are admin'
+      });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    await User.findByIdAndDelete(id);
+
+    res.status(204).send();
+  } catch (error) {
+    next(error);
   }
 };
