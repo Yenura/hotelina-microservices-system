@@ -112,7 +112,7 @@ mongosh
 
 ```powershell
 # From repository root
-.\start-all-services.ps1
+![alt text](image.png)
 ```
 
 This starts all 6 services in separate terminal windows:
