@@ -1,7 +1,7 @@
 const Guest = require("../models/Guest");
 
-// CREATE - Add a new guest
-exports.createGuest = async (req, res) => {
+// ─── CREATE ────────────────────────────────────────────────────────────────────
+exports.createGuest = async (req, res, next) => {
   try {
     const guest = new Guest(req.body);
     await guest.save();
@@ -11,54 +11,85 @@ exports.createGuest = async (req, res) => {
       data: guest,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      error: err.message,
-    });
+    next(err);
   }
 };
 
-// GET ALL - Retrieve all guests
-exports.getGuests = async (req, res) => {
+// ─── GET ALL (with pagination & search by email) ───────────────────────────────
+exports.getGuests = async (req, res, next) => {
   try {
-    const guests = await Guest.find();
+    // Pagination
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.min(100, parseInt(req.query.limit) || 10);
+    const skip  = (page - 1) * limit;
+
+    // Build filter
+    const filter = {};
+    if (req.query.email) {
+      filter.email = { $regex: req.query.email, $options: "i" };
+    }
+    if (req.query.name) {
+      filter.name = { $regex: req.query.name, $options: "i" };
+    }
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+
+    const [guests, total] = await Promise.all([
+      Guest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      Guest.countDocuments(filter),
+    ]);
+
     res.json({
       success: true,
       count: guests.length,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
       data: guests,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      error: err.message,
-    });
+    next(err);
   }
 };
 
-// GET ONE - Retrieve a single guest by ID
-exports.getGuestById = async (req, res) => {
+// ─── GET BY ID ─────────────────────────────────────────────────────────────────
+exports.getGuestById = async (req, res, next) => {
   try {
     const guest = await Guest.findById(req.params.id);
     if (!guest) {
       return res.status(404).json({
         success: false,
-        error: "Guest not found",
+        message: "Guest not found",
       });
     }
-    res.json({
-      success: true,
-      data: guest,
-    });
+    res.json({ success: true, data: guest });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      error: err.message,
-    });
+    next(err);
   }
 };
 
-// UPDATE - Update guest information
-exports.updateGuest = async (req, res) => {
+// ─── SEARCH BY EMAIL ───────────────────────────────────────────────────────────
+exports.searchByEmail = async (req, res, next) => {
+  try {
+    const { email } = req.query;
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email query parameter is required",
+      });
+    }
+    const guests = await Guest.find({
+      email: { $regex: email, $options: "i" },
+    });
+    res.json({ success: true, count: guests.length, data: guests });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── UPDATE ────────────────────────────────────────────────────────────────────
+exports.updateGuest = async (req, res, next) => {
   try {
     const updated = await Guest.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -67,7 +98,7 @@ exports.updateGuest = async (req, res) => {
     if (!updated) {
       return res.status(404).json({
         success: false,
-        error: "Guest not found",
+        message: "Guest not found",
       });
     }
     res.json({
@@ -76,21 +107,18 @@ exports.updateGuest = async (req, res) => {
       data: updated,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      error: err.message,
-    });
+    next(err);
   }
 };
 
-// DELETE - Remove a guest
-exports.deleteGuest = async (req, res) => {
+// ─── DELETE ────────────────────────────────────────────────────────────────────
+exports.deleteGuest = async (req, res, next) => {
   try {
     const deleted = await Guest.findByIdAndDelete(req.params.id);
     if (!deleted) {
       return res.status(404).json({
         success: false,
-        error: "Guest not found",
+        message: "Guest not found",
       });
     }
     res.json({
@@ -99,9 +127,6 @@ exports.deleteGuest = async (req, res) => {
       data: deleted,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      error: err.message,
-    });
+    next(err);
   }
 };
