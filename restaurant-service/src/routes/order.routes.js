@@ -11,7 +11,7 @@ const orderController = require('../controllers/order.controller');
 
 /**
  * @swagger
- * /api/orders:
+ * /api/restaurants/orders:
  *   post:
  *     summary: Create a new order
  *     tags: [Orders]
@@ -57,7 +57,7 @@ router.route('/').post(orderController.createOrder).get(orderController.getOrder
 
 /**
  * @swagger
- * /api/orders/{id}:
+ * /api/restaurants/orders/{id}:
  *   get:
  *     summary: Get an order by id
  *     tags: [Orders]
@@ -141,7 +141,7 @@ router
 
 /**
  * @swagger
- * /api/orders/{id}/status:
+ * /api/restaurants/orders/{id}/status:
  *   patch:
  *     summary: Update order status
  *     tags: [Orders]
@@ -173,7 +173,7 @@ router.patch('/:id/status', orderController.updateOrderStatus);
 
 /**
  * @swagger
- * /api/orders/room/{roomNumber}:
+ * /api/restaurants/orders/room/{roomNumber}:
  *   get:
  *     summary: Get orders by room number
  *     tags: [Orders]
