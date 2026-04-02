@@ -11,7 +11,7 @@ const foodController = require('../controllers/food.controller');
 
 /**
  * @swagger
- * /api/foods:
+ * /api/restaurants/food:
  *   post:
  *     summary: Create a new food item
  *     tags: [Foods]
@@ -48,7 +48,7 @@ router.route('/').post(foodController.createFood).get(foodController.getFoods);
 
 /**
  * @swagger
- * /api/foods/{id}:
+ * /api/restaurants/food/{id}:
  *   get:
  *     summary: Get a food item by id
  *     tags: [Foods]
@@ -121,7 +121,7 @@ router
 
 /**
  * @swagger
- * /api/foods/{id}/status:
+ * /api/restaurants/food/{id}/status:
  *   patch:
  *     summary: Update availability status of a food item
  *     tags: [Foods]
@@ -154,7 +154,7 @@ router.patch('/:id/status', foodController.updateFoodStatus);
 
 /**
  * @swagger
- * /api/foods/category/{category}:
+ * /api/restaurants/food/category/{category}:
  *   get:
  *     summary: Get foods by category
  *     tags: [Foods]

@@ -23,6 +23,9 @@ app.get('/health', healthCheck);
 
 app.use('/api/foods', foodRoutes);
 app.use('/api/orders', orderRoutes);
+// Gateway and docs use /api/restaurants prefix; keep backward compatibility with legacy /api/foods, /api/orders
+app.use('/api/restaurants/food', foodRoutes);
+app.use('/api/restaurants/orders', orderRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(notFound);

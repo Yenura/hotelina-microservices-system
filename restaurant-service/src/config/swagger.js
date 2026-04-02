@@ -16,7 +16,7 @@ const options = {
       { url: 'http://localhost:8000/api/restaurants', description: 'Development Server (Via API Gateway)' }
     ]
   },
-  apis: ['./routes/*.js', './controllers/*.js']
+  apis: ['./src/routes/*.js', './src/controllers/*.js']
 };
 
 module.exports = swaggerJsdoc(options);
