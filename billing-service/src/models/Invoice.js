@@ -9,14 +9,14 @@ const invoiceSchema = new mongoose.Schema(
       trim: true,
     },
     guestId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       required: true,
-      ref: 'Guest',
+      trim: true,
     },
     reservationId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       required: true,
-      ref: 'Reservation',
+      trim: true,
     },
     roomCharges: {
       type: Number,
@@ -76,7 +76,7 @@ const invoiceSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
       enum: ['cash', 'credit_card', 'debit_card', 'bank_transfer', 'check'],
-      default: null,
+      required: false,
     },
     invoiceDate: {
       type: Date,

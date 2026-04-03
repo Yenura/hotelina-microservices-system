@@ -1,0 +1,177 @@
+{
+  "info": {
+    "name": "Hotelina Billing Service API",
+    "description": "Collection for Billing/Payment Microservice",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "hotelina-billing"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "Check if the service is healthy"
+      }
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Create Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceNumber\": \"INV-001\",\n  \"guestId\": \"guest_12345\",\n  \"reservationId\": \"res_67890\",\n  \"roomCharges\": 150.00,\n  \"restaurantCharges\": 50.00,\n  \"additionalCharges\": 20.00,\n  \"discount\": 10.00,\n  \"taxRate\": 10,\n  \"dueDate\": \"2026-04-15\",\n  \"notes\": \"Standard invoice for guest\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/billing",
+              "host": ["{{base_url}}"],
+              "path": ["api", "billing"]
+            },
+            "description": "Create a new invoice"
+          }
+        },
+        {
+          "name": "Get All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/billing?page=1&limit=10&status=unpaid",
+              "host": ["{{base_url}}"],
+              "path": ["api", "billing"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "unpaid"
+                }
+              ]
+            },
+            "description": "Get all invoices with filters and pagination"
+          }
+        },
+        {
+          "name": "Get Invoice by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/billing/{{invoice_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "billing", "{{invoice_id}}"]
+            },
+            "description": "Get a specific invoice by ID"
+          }
+        },
+        {
+          "name": "Update Invoice",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomCharges\": 160.00,\n  \"restaurantCharges\": 55.00,\n  \"notes\": \"Updated invoice\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/billing/{{invoice_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "billing", "{{invoice_id}}"]
+            },
+            "description": "Update an existing invoice"
+          }
+        },
+        {
+          "name": "Delete Invoice",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/billing/{{invoice_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "billing", "{{invoice_id}}"]
+            },
+            "description": "Delete an invoice"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Record Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amountPaid\": 100.00,\n  \"paymentMethod\": \"credit_card\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/billing/{{invoice_id}}/payment",
+              "host": ["{{base_url}}"],
+              "path": ["api", "billing", "{{invoice_id}}", "payment"]
+            },
+            "description": "Record a payment for an invoice"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Statistics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/billing/statistics",
+          "host": ["{{base_url}}"],
+          "path": ["api", "billing", "statistics"]
+        },
+        "description": "Get payment statistics"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8005",
+      "type": "string"
+    },
+    {
+      "key": "invoice_id",
+      "value": "your_invoice_id_here",
+      "type": "string"
+    }
+  ]
+}

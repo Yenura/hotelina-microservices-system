@@ -4,6 +4,13 @@ const billingController = require('../controllers/billingController');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Billing
+ *   description: Invoice and billing management operations
+ */
+
 // ─── Validation Middleware ────────────────────────────────────────────────────
 const validateInvoice = [
   body('invoiceNumber')
@@ -37,25 +44,188 @@ const validatePayment = [
 ];
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
-// Create new invoice
+
+/**
+ * @swagger
+ * /api/billing:
+ *   post:
+ *     summary: Create a new invoice
+ *     tags: [Billing]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [invoiceNumber, guestId, reservationId, roomCharges, dueDate]
+ *             properties:
+ *               invoiceNumber:
+ *                 type: string
+ *                 example: "INV-001"
+ *               guestId:
+ *                 type: string
+ *                 example: "guest123"
+ *               reservationId:
+ *                 type: string
+ *                 example: "res123"
+ *               roomCharges:
+ *                 type: number
+ *                 example: 150.00
+ *               restaurantCharges:
+ *                 type: number
+ *               additionalCharges:
+ *                 type: number
+ *               discount:
+ *                 type: number
+ *               taxRate:
+ *                 type: number
+ *               dueDate:
+ *                 type: string
+ *                 format: date
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Invoice created successfully
+ *       400:
+ *         description: Validation error
+ *       409:
+ *         description: Invoice number already exists
+ */
 router.post('/', validateInvoice, billingController.createInvoice);
 
-// Get all invoices with filters and pagination
+/**
+ * @swagger
+ * /api/billing:
+ *   get:
+ *     summary: Get all invoices with filters and pagination
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [paid, unpaid, partial]
+ *     responses:
+ *       200:
+ *         description: List of invoices
+ */
 router.get('/', billingController.getAllInvoices);
 
-// Get payment statistics
+/**
+ * @swagger
+ * /api/billing/statistics:
+ *   get:
+ *     summary: Get payment statistics
+ *     tags: [Billing]
+ *     responses:
+ *       200:
+ *         description: Payment statistics
+ */
 router.get('/statistics', billingController.getPaymentStats);
 
-// Get invoice by ID
+/**
+ * @swagger
+ * /api/billing/{id}:
+ *   get:
+ *     summary: Get invoice by ID
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Invoice details
+ *       404:
+ *         description: Invoice not found
+ */
 router.get('/:id', billingController.getInvoiceById);
 
-// Update invoice
+/**
+ * @swagger
+ * /api/billing/{id}:
+ *   patch:
+ *     summary: Update invoice
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Invoice updated successfully
+ *       404:
+ *         description: Invoice not found
+ */
 router.patch('/:id', billingController.updateInvoice);
 
-// Record payment for an invoice
+/**
+ * @swagger
+ * /api/billing/{id}/payment:
+ *   post:
+ *     summary: Record payment for an invoice
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [amountPaid]
+ *             properties:
+ *               amountPaid:
+ *                 type: number
+ *                 example: 100.00
+ *               paymentMethod:
+ *                 type: string
+ *                 enum: [cash, credit_card, debit_card, bank_transfer, check]
+ *     responses:
+ *       200:
+ *         description: Payment recorded successfully
+ *       404:
+ *         description: Invoice not found
+ */
 router.post('/:id/payment', validatePayment, billingController.recordPayment);
 
-// Delete invoice
+/**
+ * @swagger
+ * /api/billing/{id}:
+ *   delete:
+ *     summary: Delete invoice
+ *     tags: [Billing]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Invoice deleted successfully
+ *       404:
+ *         description: Invoice not found
+ */
 router.delete('/:id', billingController.deleteInvoice);
 
 module.exports = router;
