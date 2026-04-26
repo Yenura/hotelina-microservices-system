@@ -1,4 +1,4 @@
-const Reservation = require('../models/reservationModel');
+const Reservation = require('../models/Reservation');
 
 // CREATE
 exports.createReservation = async (req, res) => {

@@ -4,10 +4,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
 const billingRoutes = require('./routes/billingRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const notFound = require('./middleware/notFound');
+const healthCheck = require('./middleware/healthCheck');
+const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
@@ -67,14 +68,10 @@ app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
 }));
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    service: process.env.SERVICE_NAME || 'billing-service',
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-  });
-});
+app.get('/health', healthCheck);
+
+// ─── Swagger Documentation ────────────────────────────────────────────────────
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/billing', billingRoutes);
