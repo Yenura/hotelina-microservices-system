@@ -19,6 +19,15 @@ connectDB()
       console.log("╚══════════════════════════════════════════════╝");
     });
 
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} already in use; is another service instance running?`);
+        process.exit(1);
+      }
+      console.error('Server error:', err);
+      process.exit(1);
+    });
+
     // ─── Graceful Shutdown ────────────────────────────────────────────────────
     process.on("SIGTERM", () => {
       console.log("🛑 SIGTERM received — shutting down gracefully...");

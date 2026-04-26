@@ -28,6 +28,12 @@ app.use('/api/restaurants/food', foodRoutes);
 app.use('/api/restaurants/orders', orderRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Raw swagger spec endpoint
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 app.use(notFound);
 app.use(errorHandler);
 

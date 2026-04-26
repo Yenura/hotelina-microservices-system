@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger');
 const gatewayRoutes = require('./routes/gateway');
 const errorHandler = require('./middleware/errorHandler');
 const { gatewayLimiter } = require('./middleware/rateLimit');
@@ -40,7 +39,17 @@ app.get('/health', (req, res) => {
 });
 
 // Swagger docs for API Gateway
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(null, {
+  swaggerOptions: {
+    urls: [
+      { url: '/swagger/auth.json', name: 'Auth Service' },
+      { url: '/swagger/reservations.json', name: 'Reservation Service' },
+      { url: '/swagger/guests.json', name: 'Guest Service' },
+      { url: '/swagger/restaurants.json', name: 'Restaurant Service' },
+      { url: '/swagger/billing.json', name: 'Billing Service' }
+    ]
+  }
+}));
 
 // Gateway routes
 app.use('/api', gatewayRoutes);

@@ -24,6 +24,12 @@ app.get('/health', healthCheck);
 // ─── Swagger Documentation ────────────────────────────────────────────────────
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Raw swagger spec endpoint
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/reservations', reservationRoutes);
 

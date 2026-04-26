@@ -90,6 +90,13 @@ const options = {
             data: { $ref: '#/components/schemas/Guest' },
           },
         },
+        ErrorResponse: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: false },
+            message: { type: 'string', example: 'Access denied. No token provided.' },
+          },
+        },
         GuestListResponse: {
           type: 'object',
           properties: {
