@@ -39,10 +39,22 @@ const protect = require("../middleware/authMiddleware");
  *               $ref: '#/components/schemas/GuestResponse'
  *       400:
  *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       409:
  *         description: Email or NIC already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/", protect, controller.createGuest);
 
@@ -134,6 +146,10 @@ router.get("/search", controller.searchByEmail);
  *               $ref: '#/components/schemas/GuestResponse'
  *       404:
  *         description: Guest not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get("/:id", controller.getGuestById);
 
@@ -165,10 +181,22 @@ router.get("/:id", controller.getGuestById);
  *     responses:
  *       200:
  *         description: Guest updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GuestResponse'
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Guest not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.put("/:id", protect, controller.updateGuest);
 
@@ -190,10 +218,22 @@ router.put("/:id", protect, controller.updateGuest);
  *     responses:
  *       200:
  *         description: Guest deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GuestResponse'
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Guest not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete("/:id", protect, controller.deleteGuest);
 
